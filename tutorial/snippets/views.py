@@ -12,7 +12,7 @@ class JSONResponse(HttpResponse):
     """
     def __init__(self, data, **kwargs):
         content = JSONRenderer().render(data)
-        kwargs['content-type'] = 'application/json'
+        kwargs['content_type'] = 'application/json'
         super(JSONResponse, self).__init__(content, **kwargs)
 
 
@@ -30,7 +30,7 @@ def snippet_list(request):
     elif request.method == 'POST':
         data = JSONParser().parse(request)
         serializer = SnippetSerializer(data=data)
-        if(serializer.is_valid()):
+        if serializer.is_valid():
             serializer.save()
             return JSONResponse(serializer.data, status=201)
         return JSONResponse(serializer.errors, status=400)
@@ -42,7 +42,7 @@ def snippet_detail(request, pk):
     """
     try:
         snippet = Snippet.objects.get(pk=pk)
-    except:
+    except Snippet.DoesNotExist:
         return HttpResponse(status=404)
 
     if request.method == 'GET':
@@ -54,7 +54,7 @@ def snippet_detail(request, pk):
         serializer = SnippetSerializer(snippet, data=data)
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data, status=201)
+            return JSONResponse(serializer.data)
         return JSONResponse(serializer.errors, status=400)
 
     elif request.method == 'DELETE':
