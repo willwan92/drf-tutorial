@@ -72,6 +72,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'tutorial.wsgi.application'
 
 
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 10
+}
+
+
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
