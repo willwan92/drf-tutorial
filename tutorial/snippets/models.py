@@ -1,6 +1,9 @@
 from django.db import models
 from pygments.lexers import get_all_lexers
 from pygments.styles import get_all_styles
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters.html import HtmlFormatter
+from pygments import highlight
 
 # 该文件中定义变量和类可以再序列化类中导入使用
 # 定义需要用的变量
@@ -14,11 +17,24 @@ class Snippet(models.Model):
     定义字段
     """
     created = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey('auth.User', related_name='snippets', on_delete=models.CASCADE)
     title = models.CharField(max_length=100, blank=True, default='')
     code = models.TextField()
     linenos = models.BooleanField(default=False)
     language = models.CharField(choices=LANGUAGE_CHOICES, default='python', max_length=100)
     style = models.CharField(choices=STYLE_CHOICES, default='friendly', max_length=100)
+    highlighted = models.TextField()
 
+    def save(self, *args, **kwargs):
+        """
+        使用`pygments`库创建一个高亮显示的HTML表示代码段。
+        """
+        lexer = get_lexer_by_name(self.language)
+        linenos = self.linenos and 'table' or False
+        options = self.title and {'title': self.title} or {}
+        formatter = HtmlFormatter(style=self.style, linenos=linenos, full=True, **options)
+        self.highlighted = highlight(self.code, lexer, formatter)
+        super(Snippet, self).save(*args, **kwargs)
+        
     class Meta:
         ordering = ('created',)
