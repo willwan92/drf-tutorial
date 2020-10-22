@@ -12,14 +12,6 @@ from rest_framework import renderers
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-# API根路径
-@api_view(['get'])
-def api_root(request, format=None):
-    return Response({
-        'users': reverse('user-list', request=request, format=format),
-        'snippets': reverse('snippet-list', request=request, format=format)
-    })
-
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
